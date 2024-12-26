@@ -1,5 +1,6 @@
-"use client";
-import React, { createContext, useContext, useState, ReactNode } from "react";
+'use client';
+
+import React, { createContext, useContext, useState, ReactNode } from 'react';
 import {
   Modal,
   ModalContent,
@@ -7,7 +8,7 @@ import {
   ModalBody,
   ModalFooter,
   useDisclosure,
-} from "@nextui-org/modal";
+} from '@nextui-org/modal';
 
 interface ModalContextType {
   showModal: (config: {
@@ -23,9 +24,7 @@ interface ModalContextType {
 
 const ModalContext = createContext<ModalContextType | undefined>(undefined);
 
-export const ModalProvider: React.FC<{ children: ReactNode }> = ({
-  children,
-}) => {
+export const ModalProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [modalContent, setModalContent] = useState<{
     title?: ReactNode;
     body?: ReactNode;
@@ -54,9 +53,10 @@ export const ModalProvider: React.FC<{ children: ReactNode }> = ({
     if (getter) {
       try {
         const result = await getter();
+
         setData(result);
       } catch (error) {
-        console.error("Error fetching data:", error);
+        console.error('Error fetching data:', error);
         setData(null);
       }
     } else {
@@ -72,22 +72,18 @@ export const ModalProvider: React.FC<{ children: ReactNode }> = ({
       <Modal
         backdrop="blur"
         classNames={{
-          backdrop: "max-h-screen overflow-hidden",
-          wrapper: "max-h-screen overflow-hidden",
+          backdrop: 'max-h-screen overflow-hidden',
+          wrapper: 'max-h-screen overflow-hidden',
         }}
         isOpen={isOpen}
         onOpenChange={onClose}
       >
-        <ModalContent className={modalContent?.modalClassName || ""}>
+        <ModalContent className={modalContent?.modalClassName || ''}>
           {modalContent && (
             <>
-              {modalContent.title && (
-                <ModalHeader>{modalContent.title}</ModalHeader>
-              )}
+              {modalContent.title && <ModalHeader>{modalContent.title}</ModalHeader>}
               {modalContent.body && <ModalBody>{modalContent.body}</ModalBody>}
-              {modalContent.footer && (
-                <ModalFooter>{modalContent.footer}</ModalFooter>
-              )}
+              {modalContent.footer && <ModalFooter>{modalContent.footer}</ModalFooter>}
             </>
           )}
         </ModalContent>
@@ -99,8 +95,10 @@ export const ModalProvider: React.FC<{ children: ReactNode }> = ({
 // Hook to use modal context
 export const useModalContext = (): ModalContextType => {
   const context = useContext(ModalContext);
+
   if (!context) {
-    throw new Error("useModalContext must be used within a ModalProvider");
+    throw new Error('useModalContext must be used within a ModalProvider');
   }
+
   return context;
 };

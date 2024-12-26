@@ -1,24 +1,11 @@
-"use client";
+'use client';
 
 // SchedulerContext.tsx
-import React, {
-  createContext,
-  useContext,
-  useReducer,
-  ReactNode,
-  Dispatch,
-  useEffect,
-} from "react";
-import { z } from "zod";
-import { ModalProvider } from "./modal-provider";
-import {
-  Action,
-  Event,
-  Getters,
-  Handlers,
-  SchedulerContextType,
-  startOfWeek,
-} from "@/types/index";
+import { createContext, useContext, useReducer, ReactNode, useEffect } from 'react';
+
+import { ModalProvider } from './modal-provider';
+
+import { Action, Event, Getters, Handlers, SchedulerContextType, startOfWeek } from '@/types/index';
 // Define event and state types
 
 interface SchedulerState {
@@ -26,13 +13,7 @@ interface SchedulerState {
 }
 
 // Define the variant options
-export const variants = [
-  "success",
-  "primary",
-  "default",
-  "warning",
-  "danger",
-] as const;
+export const variants = ['success', 'primary', 'default', 'warning', 'danger'] as const;
 
 // Initial state
 const initialState: SchedulerState = {
@@ -40,27 +21,22 @@ const initialState: SchedulerState = {
 };
 
 // Reducer function
-const schedulerReducer = (
-  state: SchedulerState,
-  action: Action
-): SchedulerState => {
+const schedulerReducer = (state: SchedulerState, action: Action): SchedulerState => {
   switch (action.type) {
-    case "ADD_EVENT":
+    case 'ADD_EVENT':
       return { ...state, events: [...state.events, action.payload] };
 
-    case "REMOVE_EVENT":
+    case 'REMOVE_EVENT':
       return {
         ...state,
         events: state.events.filter((event) => event.id !== action.payload.id),
       };
-    case "UPDATE_EVENT":
+    case 'UPDATE_EVENT':
       return {
         ...state,
-        events: state.events.map((event) =>
-          event.id === action.payload.id ? action.payload : event
-        ),
+        events: state.events.map((event) => (event.id === action.payload.id ? action.payload : event)),
       };
-    case "SET_EVENTS":
+    case 'SET_EVENTS':
       return { ...state, events: action.payload };
 
     default:
@@ -69,9 +45,7 @@ const schedulerReducer = (
 };
 
 // Create the context with the correct type
-const SchedulerContext = createContext<SchedulerContextType | undefined>(
-  undefined
-);
+const SchedulerContext = createContext<SchedulerContextType | null>(null);
 
 // Provider component
 export const SchedulerProvider = ({
@@ -80,7 +54,7 @@ export const SchedulerProvider = ({
   onUpdateEvent,
   onDeleteEvent,
   initialState,
-  weekStartsOn = "sunday",
+  weekStartsOn = 'sunday',
 }: {
   onAddEvent?: (event: Event) => void;
   onUpdateEvent?: (event: Event) => void;
@@ -96,24 +70,21 @@ export const SchedulerProvider = ({
 
   useEffect(() => {
     if (initialState) {
-      dispatch({ type: "SET_EVENTS", payload: initialState });
+      dispatch({ type: 'SET_EVENTS', payload: initialState });
     }
   }, [initialState]);
 
   // global getters
   const getDaysInMonth = (month: number, year: number) => {
-    return Array.from(
-      { length: new Date(year, month + 1, 0).getDate() },
-      (_, index) => ({
-        day: index + 1,
-        events: [],
-      })
-    );
+    return Array.from({ length: new Date(year, month + 1, 0).getDate() }, (_, index) => ({
+      day: index + 1,
+      events: [],
+    }));
   };
 
   const getDaysInWeek = (week: number, year: number) => {
     // Determine if the week should start on Sunday (0) or Monday (1)
-    const startDay = weekStartsOn === "sunday" ? 0 : 1;
+    const startDay = weekStartsOn === 'sunday' ? 0 : 1;
 
     // Get January 1st of the year
     const janFirst = new Date(year, 0, 1);
@@ -123,16 +94,15 @@ export const SchedulerProvider = ({
 
     // Calculate the start of the week by finding the correct day in the year
     const weekStart = new Date(janFirst);
-    weekStart.setDate(
-      janFirst.getDate() +
-        (week - 1) * 7 +
-        ((startDay - janFirstDayOfWeek + 7) % 7)
-    );
+
+    weekStart.setDate(janFirst.getDate() + (week - 1) * 7 + ((startDay - janFirstDayOfWeek + 7) % 7));
 
     // Generate the week’s days
     const days = [];
+
     for (let i = 0; i < 7; i++) {
       const day = new Date(weekStart);
+
       day.setDate(day.getDate() + i);
       days.push(day);
     }
@@ -141,14 +111,12 @@ export const SchedulerProvider = ({
   };
 
   const getWeekNumber = (date: Date) => {
-    const d = new Date(
-      Date.UTC(date.getFullYear(), date.getMonth(), date.getDate())
-    );
+    const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+
     d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
     const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
-    const weekNo = Math.ceil(
-      ((d.getTime() - yearStart.getTime()) / 86400000 + 1) / 7
-    );
+    const weekNo = Math.ceil(((d.getTime() - yearStart.getTime()) / 86400000 + 1) / 7);
+
     return weekNo;
   };
 
@@ -160,10 +128,12 @@ export const SchedulerProvider = ({
 
       // Create new Date objects to avoid mutating `currentDate`
       const startOfDay = new Date(currentDate);
+
       startOfDay.setDate(day);
       startOfDay.setHours(0, 0, 0, 0);
 
       const endOfDay = new Date(currentDate);
+
       endOfDay.setDate(day + 1);
       endOfDay.setHours(0, 0, 0, 0);
 
@@ -180,7 +150,8 @@ export const SchedulerProvider = ({
   };
 
   const getDayName = (day: number) => {
-    const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
     return days[day];
   };
 
@@ -209,10 +180,8 @@ export const SchedulerProvider = ({
 
     if (event.startDate instanceof Date && event.endDate instanceof Date) {
       // Normalize start and end dates to only include hours and minutes
-      const startTime =
-        event.startDate.getHours() * 60 + event.startDate.getMinutes(); // Convert to minutes
-      const endTime =
-        event.endDate.getHours() * 60 + event.endDate.getMinutes(); // Convert to minutes
+      const startTime = event.startDate.getHours() * 60 + event.startDate.getMinutes(); // Convert to minutes
+      const endTime = event.endDate.getHours() * 60 + event.endDate.getMinutes(); // Convert to minutes
 
       // Calculate the difference in minutes between start and end times
       const diffInMinutes = endTime - startTime;
@@ -222,8 +191,7 @@ export const SchedulerProvider = ({
       // console.log("eventHeight", eventHeight);
 
       // Get the event start hour as a fraction (e.g., 13.5 for 13:30)
-      const eventStartHour =
-        event.startDate.getHours() + event.startDate.getMinutes() / 60;
+      const eventStartHour = event.startDate.getHours() + event.startDate.getMinutes() / 60;
 
       // Define the day-end hour (24.0 for midnight)
       const dayEndHour = 24;
@@ -237,7 +205,7 @@ export const SchedulerProvider = ({
       // Calculate the top position based on the event's start time (64px per hour)
       eventTop = eventStartHour * 64;
     } else {
-      console.error("Invalid event or missing start/end dates.");
+      console.error('Invalid event or missing start/end dates.');
     }
 
     return {
@@ -251,21 +219,21 @@ export const SchedulerProvider = ({
   }
 
   function handleAddEvent(event: Event) {
-    dispatch({ type: "ADD_EVENT", payload: event });
+    dispatch({ type: 'ADD_EVENT', payload: event });
     if (onAddEvent) {
       onAddEvent(event);
     }
   }
 
   function handleUpdateEvent(event: Event, id: string) {
-    dispatch({ type: "UPDATE_EVENT", payload: { ...event, id } });
+    dispatch({ type: 'UPDATE_EVENT', payload: { ...event, id } });
     if (onUpdateEvent) {
       onUpdateEvent(event);
     }
   }
 
   function handleDeleteEvent(id: string) {
-    dispatch({ type: "REMOVE_EVENT", payload: { id } });
+    dispatch({ type: 'REMOVE_EVENT', payload: { id } });
     if (onDeleteEvent) {
       onDeleteEvent(id);
     }
@@ -279,9 +247,7 @@ export const SchedulerProvider = ({
   };
 
   return (
-    <SchedulerContext.Provider
-      value={{ events: state, dispatch, getters, handlers, weekStartsOn }}
-    >
+    <SchedulerContext.Provider value={{ events: state, dispatch, getters, handlers, weekStartsOn }}>
       <ModalProvider>{children}</ModalProvider>
     </SchedulerContext.Provider>
   );
@@ -290,8 +256,10 @@ export const SchedulerProvider = ({
 // Custom hook to use the scheduler context
 export const useScheduler = () => {
   const context = useContext(SchedulerContext);
+
   if (!context) {
-    throw new Error("useScheduler must be used within a SchedulerProvider");
+    throw new Error('useScheduler must be used within a SchedulerProvider');
   }
+
   return context;
 };
